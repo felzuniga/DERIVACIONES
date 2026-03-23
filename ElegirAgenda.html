@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    p { font-size: 13px; color: #444; }
+    select { width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+    
+    /* Contenedor para alinear el único botón a la derecha */
+    .button-container {
+      margin-top: 20px;
+      overflow: hidden; /* Limpia el float */
+    }
+    
+    button { 
+      padding: 10px 15px; 
+      border: none; 
+      border-radius: 4px; 
+      cursor: pointer; 
+      float: right; /* Alinea el botón a la derecha */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Botón de Procesar (Verde) */
+    button#assignButton { background-color: #4CAF50; color: white; }
+    button#assignButton:hover { background-color: #45a049; }
+    
+    /* Estilo para el botón deshabilitado */
+    button:disabled { 
+      background-color: #cccccc; 
+      color: #666;
+      cursor: not-allowed; 
+    }
+    
+    /* Estilo para el spinner (indicador de carga) */
+    .loader {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #ffffff;
+      border-radius: 50%;
+      width: 14px;
+      height: 14px;
+      animation: spin 1s linear infinite;
+      display: none; /* Oculto por defecto */
+      margin-right: 8px;
+    }
+    @keyframes spin { 
+      0% { transform: rotate(0deg); } 
+      100% { transform: rotate(360deg); } 
+    }
+  </style>
+</head>
+<body>  
+  <p>Seleccione la agenda para todas las filas marcadas.</p>
+  <p style="color: #c9302c; font-weight: bold;">
+    Atención: Esta acción procesará los casos y no se puede cancelar una vez iniciada.
+  </p>
+
+  <select id="opcionSeleccionada">
+    <option value="">-- Seleccione una Agenda --</option>
+  </select>
+
+  <div class="button-container">
+    <button id="assignButton" disabled>
+      <span class="loader" id="spinner"></span>
+      <span id="assignButtonText">Asignar y Procesar</span>
+    </button>
+  </div>
+
+  <script>
+    // Referencias a los elementos
+    const select = document.getElementById('opcionSeleccionada');
+    const assignBtn = document.getElementById('assignButton');
+    const spinner = document.getElementById('spinner');
+    const assignBtnText = document.getElementById('assignButtonText');
+
+    // --- Validación (habilita "Asignar") ---
+    select.addEventListener('change', function() {
+      if (select.value === "") {
+        assignBtn.disabled = true;
+      } else {
+        assignBtn.disabled = false;
+      }
+    });
+
+    // Lógica de Procesar (con Confirmación de dos pasos)
+    assignBtn.addEventListener('click', function() {
+      const seleccion = select.value;
+      if (seleccion === "") {
+        alert("Debe seleccionar una agenda válida.");
+        return;
+      }
+      
+      // Inicio de la confirmación de dos pasos
+      const mensajeConfirmacion = `¿Está seguro que desea asignar la agenda:\n\n"${seleccion}"\n\na todas las filas marcadas? Esta acción no se puede deshacer.`;
+      
+      // El script se detiene aquí y muestra un pop-up nativo
+      if (confirm(mensajeConfirmacion)) {
+        // El usuario hizo clic en "Aceptar", ahora sí procesamos
+        
+        // Bloqueamos el botón y mostramos "Procesando"
+        assignBtn.disabled = true;
+        spinner.style.display = 'block';
+        assignBtnText.textContent = 'Procesando...';
+
+        // Llamada al servidor
+        google.script.run
+          .withSuccessHandler(onSuccess)
+          .withFailureHandler(onFailure)
+          .asignarValorPorCheckboxConInput(seleccion);
+          
+      } else {
+        // El usuario hizo clic en "Cancelar"
+        // No hacemos nada. El pop-up se queda abierto para que elija otra cosa.
+      }
+    });
+
+    // Si el servidor responde con éxito
+    function onSuccess() {
+      google.script.host.close(); // Cerramos el pop-up
+    }
+
+    // Si el servidor responde con error
+    function onFailure(error) {
+      alert("El proceso falló: " + error);
+      
+      // Reactivamos el botón
+      assignBtn.disabled = false; // Se reactiva
+      spinner.style.display = 'none';
+      assignBtnText.textContent = 'Asignar y Procesar';
+    }
+
+    // Carga inicial de las agendas
+    document.addEventListener('DOMContentLoaded', function() {
+      assignBtn.disabled = true; // Deshabilitado mientras cargan las agendas
+      
+      google.script.run.withSuccessHandler(function(opciones) {
+        opciones.forEach(function(op) {
+          const opt = document.createElement('option');
+          opt.value = op;
+          opt.textContent = op;
+          select.appendChild(opt);
+        });
+      }).getOpcionesParaDesplegable();
+    });
+  </script>
+</body>
+</html>
