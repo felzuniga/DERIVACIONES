@@ -3,11 +3,12 @@
 /**
  * Añade el menú a la planilla central "Asignación de Cupos".
  */
+
 function onOpen() {
   const ui = SpreadsheetApp.getUi();
   ui.createMenu('⚙️ Acciones de Carga')
     .addItem('📤 Distribuir por Especialidad', 'distribuirCasosPorEspecialidad')
-    //.addItem('⬆️ Subir Casos (⚠️ Exclusivo M. Lara)', 'CargarTodosLosCasos')
+    .addItem('⬆️ Subir Casos (⚠️ Exclusivo Depto. TI)', 'CargarTodosLosCasos')
     .addToUi();  
 }
 
