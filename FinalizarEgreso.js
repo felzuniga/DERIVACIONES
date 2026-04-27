@@ -64,9 +64,9 @@ function procesarFinalizacionEgreso(hojaOrigen, filaEditada, COLUMNAS_ACTUAL) {
   const nuevoEstadoCod = valoresFila[COLUMNAS_ACTUAL.ESTADO_NUEVO_COD - 1];
   const checkCell = hojaOrigen.getRange(filaEditada, COLUMNAS_ACTUAL.CHECK_FINALIZAR);
 
-  // Verificación: ¿El estado es realmente 11?
-  if (nuevoEstadoCod !== 11) {
-    SpreadsheetApp.getUi().alert("Error: Para procesar el egreso, el 'Estado Nuevo' (columna AC) debe ser 11 (Egresado).");
+  // ACTUALIZACIÓN 23/03 - Verificación: ¿El estado es realmente 11, 12 o 13?
+  if (![11, 12, 13].includes(nuevoEstadoCod)) {
+    SpreadsheetApp.getUi().alert("Error: Para procesar el egreso, el 'Estado Nuevo' (columna AC) debe ser 11 (Egresado), 12 (Egresado otro establecimiento) o 13 (Menor de edad).");
     checkCell.setValue(false); // Desmarca si el estado no es correcto
     return;
   }
