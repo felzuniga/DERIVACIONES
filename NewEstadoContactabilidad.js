@@ -443,8 +443,10 @@ function obtenerTodasLasGestiones(agentSpreadsheet) {
       const colID = COLUMNAS_AGENTE.ID_CASO - 1;
       const colEstNum = (isAgendar ? COLUMNAS_AGENTE.AGENDAR.ESTADO_CONTACTO : COLUMNAS_AGENTE.NOTIFICAR.ESTADO_CONTACTO) - 1;
       const colEstAdh = (isAgendar ? COLUMNAS_AGENTE.AGENDAR.ESTADO_ADHERENCIA : COLUMNAS_AGENTE.NOTIFICAR.ESTADO_ADHERENCIA) - 1;
-      const colFecha = 23;
-      const colAgenda = 9; // J
+      //const colFecha = 23;
+      const colFecha = (isAgendar ? COLUMNAS_AGENTE.AGENDAR.FECHA_GESTION : COLUMNAS_AGENTE.NOTIFICAR.FECHA_GESTION) - 1;
+      //const colAgenda = 9; // J
+      const colAgenda = (isAgendar ? COLUMNAS_AGENTE.AGENDAR.AGENDA : COLUMNAS_AGENTE.NOTIFICAR.AGENDA) - 1;
       const colFechaCita = (isAgendar ? COLUMNAS_AGENTE.AGENDAR.FECHA_CITA : COLUMNAS_AGENTE.NOTIFICAR.FECHA_CITA) - 1;
       const colHoraCita = (isAgendar ? COLUMNAS_AGENTE.AGENDAR.HORA_CITA : COLUMNAS_AGENTE.NOTIFICAR.HORA_CITA) - 1;
 
